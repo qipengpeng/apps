@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ugo.dao.ApkVersionDao">
+    <!-- 目的：为dao接口方法提供sql语句配置 -->
+    
+    <!-- 保存上传apk数据 -->
+    <insert id="addApk" parameterType="ApkVersion">
+    	INSERT INTO apk_versions (
+		  version_code,
+		  package,
+		  `md5`,
+		  desc_area,
+		  down_url,
+		  created_at
+		) 
+		VALUES
+		  (
+		  #{versionCode},
+		  #{packageName},
+		  #{md5},
+		  #{descArea},
+		  #{downUrl},
+		  NOW()
+		  )
+    </insert>
+    
+    <!-- 获取所有版本号 -->
+    <select id="findVersionCode" resultType="Integer">
+    	SELECT version_code FROM apk_versions;
+    </select>
+    
+    <!-- 更新指定设备版本 -->
+    <update id="updateVersion" >
+    	UPDATE 
+		  vendors 
+		SET
+		  `version` = #{version},
+		  update_vsesion_time = #{versionTime}
+		WHERE id = #{vendorId} ;
+    </update>
+    
+    <!-- 更新全部设备版本 -->
+    <update id="updateALLVersion">
+    	UPDATE vendors SET `version` = #{version},update_vsesion_time = #{versionTime}
+    </update>
+    
+    <!-- 同步指定设备版本 -->
+    <update id="setVersion" >
+    	UPDATE 
+		  vendors 
+		SET
+		  `version_code` = #{version}
+		WHERE id = #{vendorId} ;
+    </update>
+</mapper>

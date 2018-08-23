@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+	<mapper namespace="com.ugo.dao.DemandsDao">
+	
+    <!-- 目的：为dao接口方法提供sql语句配置 -->
+    <select id="getDemandsList" resultType="Demands">
+        SELECT * FROM demands  ORDER BY state ASC,id DESC
+    </select>
+    
+    <!-- 根据需求ID 获取需求的详情信息 -->
+    <select id="getDemandDetails" parameterType="int" resultType="DemandDetails">
+        SELECT * FROM demand_details where demand_id = #{demandId}
+    </select>
+    
+    <!-- 根据需求ID 获取需求的基本信息 -->
+    <select id="getDemand" parameterType="int" resultType="Demands">
+        SELECT * FROM demands where id = #{id}
+    </select>
+   
+    <!-- 根据ID需求获取需求对应的点位 -->
+    <select id="getDemandNodes" parameterType="int" resultType="Nodes">
+        SELECT DISTINCT(node_id) as id FROM demand_details where demand_id = #{demandId}
+    </select>
+    
+    <!-- 需求商品汇总 -->
+    <select id="checkList" parameterType="int" resultType="DemandTemplateDetails">
+    	SELECT 
+		  product_id,
+		  product_name,
+		  SUM(num) as num
+		FROM
+		  demand_details 
+		WHERE demand_id = #{demandId}
+		GROUP BY product_id ;
+    </select>
+    
+    <!-- 获取设备信息 --> 
+    <select id="getVmsList" parameterType="DemandDetails" resultType="NodeVms">
+        SELECT DISTINCT 
+		  (vendor_id),
+		  node_vm_seq_name as nodeVmName
+		FROM
+		  demand_details 
+		WHERE demand_id = #{demandId} 
+		  AND node_id = #{nodeId}
+    </select>
+    <!-- 获取商品信息 --> 
+    <select id="getProductList" parameterType="DemandDetails" resultType="DemandTemplateDetails">
+        SELECT DISTINCT 
+		  (product_id),product_name
+		FROM
+		  demand_details 
+		WHERE node_id = #{nodeId} 
+		  AND vendor_id = #{vendorId}
+		  AND demand_id = #{demandId}
+    </select>
+    
+	<!-- 添加需求信息 -->
+	<insert id="addDemands" parameterType="Deliveries" useGeneratedKeys="true" keyProperty="id">
+			INSERT INTO demands (demand_date, operator,created_at) 
+				VALUES
+		    (#{demandDate},#{operator},NOW()) 
+	</insert>
+	
+	<!-- 添加需求详情 -->
+	<insert id="addDemandDetails" parameterType="DemandDetails">
+		INSERT INTO demand_details (
+				  demand_id,
+				  node_id,
+				  node_vm_seq,
+				  node_vm_seq_name,
+				  vendor_id,
+				  product_id,
+				  product_name,
+				  num,created_at
+				) 
+				VALUES
+  (#{demandId},#{nodeId},#{nodeVmSeq},#{nodeVmSeqName},#{vendorId},#{productId},#{productName},#{num},NOW()) 
+	</insert>
+	<!--  -->
+	<select id="getProductIdList" resultType="DemandDetails">
+        SELECT DISTINCT(product_id),product_name FROM demand_details WHERE demand_id = #{demandId}
+    </select>
+    
+    <select id="getAmountNum" resultType="int" parameterType="DemandDetails">
+         SELECT
+			  SUM(num)
+			FROM
+			  demand_details
+			WHERE demand_id = #{demandId}
+			  AND node_id = #{nodeId}
+			  AND vendor_id = #{vendorId}
+			  AND product_id = #{productId} 
+    </select>
+  	
+  	<!-- 获取点位信息和配送线路 -->
+  	<select id="getDeliversNode"  resultType ="DeliversNode">
+       	SELECT 
+		  node_id AS id,
+		  node_name AS NAME,
+		  route_id AS lineId
+		FROM
+		  route_node 
+    </select>
+    <!-- 获取点位信息和配送线路 -->
+  	<select id="getDelivers" resultType="Delivers">
+       	SELECT 
+		  id,NAME
+		FROM
+		route_details
+    </select>
+    
+    <!-- 取消需求 -->
+    <update id="abrogateDemand" parameterType="int"> 
+     UPDATE 
+	  demands 
+	SET
+	  state = 3 
+	WHERE id = #{id}
+    </update>
+    <!-- 修改需求状态 -->
+    <update id="updateDemandStatus" parameterType="Demands"> 
+     UPDATE 
+	  demands 
+	SET
+	  state = #{state} 
+	WHERE id = #{id}
+    </update>
+	
+</mapper>

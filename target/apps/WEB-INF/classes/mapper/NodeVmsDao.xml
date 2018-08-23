@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.ugo.dao.NodeVmsDao">
+    <!-- 目的：为dao接口方法提供sql语句配置 -->
+    <select id="getNodeVmsList" resultType="NodeVms" parameterType="int">
+        SELECT 
+		  nv.*,
+		  pt.name AS tempName 
+		FROM
+		  node_vms nv,
+		  product_template pt 
+		WHERE nv.node_id = #{nodeID} 
+		  AND nv.temp_id = pt.id  
+    </select>
+    
+    <!-- 获取点位包含的设备 -->
+    <select id="getVendors" resultType="NodeVms" parameterType="int">
+        select vendor_id,node_vm_name,temp_id from node_vms where node_id = #{nodeId}
+    </select>
+    
+    <!-- 插入点位设备信息 -->
+    <insert id="addNodeVms" parameterType="NodeVms">
+     insert into node_vms(
+     		node_id,node_name,node_vm_name,vendor_id,temp_id
+     )values(#{nodeId},#{nodeName},#{nodeVmName},#{vendorId},#{tempId})
+    </insert>
+    
+    <!-- 修改点位设备详情信息 -->
+    <update id="updateNodeVms" parameterType="NodeVms" >
+       update node_vms 
+       <set>
+       		<if test="vendorId != 0">
+                vendor_id = #{vendorId},
+            </if>
+            <if test="nodeVmName != null">
+                node_vm_name = #{nodeVmName},
+            </if>
+            <if test="tempId != 0">
+                temp_id = #{tempId},
+            </if>
+            <if test="nodeName != null">
+                node_name = #{nodeName},
+            </if>
+            updated_at = NOW()
+       </set>
+       where node_id = #{nodeId}
+    </update>
+    
+    <delete id="deleteNodeVms" parameterType="int">
+    	delete from node_vms where node_id = #{nodeId}
+    </delete>
+</mapper>

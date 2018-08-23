@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ugo.dao.ReplenishmentDetailsDao">
+    <!-- 目的：为dao接口方法提供sql语句配置 -->
+    
+    <!-- 从任务详情表获取对应点位 -->
+    <select id="queryNodesList" parameterType="int" resultType="Nodes" >
+    	SELECT DISTINCT
+		  node_id as id,node_name as name
+		FROM
+		  replenishment_details 
+		WHERE replenishment_task_id = #{taskId}
+		and state = 1
+    </select>
+    
+    <!-- 获取设备信息-->
+	<select id="queryNodeVmsList"  parameterType="ReplenishmentDetails" resultType="NodeVms">
+   		SELECT DISTINCT 
+		  vendor_id,
+		  node_vm_seq_name as nodeVmName
+		FROM
+		  replenishment_details 
+		WHERE replenishment_task_id = #{replenishmentTaskId}  
+		  AND node_id =  #{nodeId}
+		  and state = 1
+   </select>
+    
+   <!-- 获取任务商品信息-->
+   <select id="queryReplenishmentDetails"  parameterType="ReplenishmentDetails" resultType="ReplenishmentDetails">
+   		SELECT 
+		  channel_id,product_id,product_name,num
+		FROM
+		  replenishment_details 
+		WHERE replenishment_task_id = #{replenishmentTaskId}  
+		  AND node_id = #{nodeId}   
+		  AND vendor_id =#{vendorId}
+   </select>
+   
+   <!-- 获取任务商品数量-->
+   <select id="queryReplenishmentDetailsNum"  parameterType="ReplenishmentDetails" resultType="int">
+   		SELECT 
+		  num
+		FROM
+		  replenishment_details 
+		WHERE replenishment_task_id = #{replenishmentTaskId}  
+		  AND node_id = #{nodeId}   
+		  AND vendor_id =#{vendorId}
+		  AND channel_id =#{channelId}
+   </select>
+   
+     <!-- 获取实际商品信息-->
+   <select id="querySales"  parameterType="ReplenishmentDetails" resultType="ReplenishmentDetails">
+   		SELECT 
+		  product_id,product_name,existing_num AS num
+		FROM
+		  sales 
+		WHERE  node_id = #{nodeId}   
+		  AND vendor_id =#{vendorId}
+		  and channel_id = #{channelId}
+   </select>
+   
+     <!-- 获取所有实际点位-->
+   <select id="querySalesNodeList"  resultType="Nodes" >
+    	SELECT DISTINCT
+		  node_id as id,node_name as name
+		FROM
+		  sales 
+    </select>
+    
+    <!-- 获取所有实际设备信息-->
+	<select id="querySalesNodeVmsList"  parameterType="int" resultType="NodeVms">
+   		SELECT DISTINCT 
+   		  node_id,
+		  vendor_id,
+		  vendor_name AS nodeVmName
+		FROM
+		  sales 
+		WHERE node_id = #{nodeId}
+   </select>
+   
+    <!-- 获取所有实际商品信息-->
+   <select id="getSales"  parameterType="Sales" resultType="Sales">
+   		SELECT 
+		  channel_id,product_id,product_name,existing_num
+		FROM
+		  sales 
+		WHERE  node_id = #{nodeId}   
+		  AND vendor_id =#{vendorId}
+   </select>
+   
+    <!-- 获取模版类型-->
+   <select id="getChannelType"  parameterType="int" resultType="int">
+   		SELECT 
+		  channels_type 
+		FROM
+		  product_template 
+		WHERE id = 
+		  (SELECT 
+		    temp_id 
+		  FROM
+		    node_vms 
+		  WHERE vendor_id = #{vendorId})
+   </select>
+    
+	<!-- 修改任务详情状态 -->
+	<update id="updateReplenishmentDetailsState" parameterType="ReplenishmentDetails">
+		UPDATE 
+		  replenishment_details 
+		SET
+		  state = 2 
+		WHERE replenishment_task_id = #{replenishmentTaskId}
+		AND node_id = #{nodeId}
+		AND vendor_id = #{vendorId}
+	</update> 
+	
+	<!-- 获取加热时间 -->
+	<select id="getHeatUpTime" parameterType="ReplenishmentDetails" resultType="int">
+		SELECT 
+		   heat_up_time
+		FROM
+		  replenishment_details 
+		WHERE replenishment_task_id = #{replenishmentTaskId}  
+		  AND node_id = #{nodeId}   
+		  AND vendor_id = #{vendorId} 
+		  AND channel_id = #{channelId}
+	</select>
+</mapper>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ugo.dao.WeiXinClientSideDao">
+    <!-- 目的：为dao接口方法提供sql语句配置 -->
+    <!-- 获取商品列表 -->
+    <select id="getProductList" resultType="WeixinProductList" parameterType="int">
+       SELECT 
+		  id,
+		  NAME,
+		  details_img,
+		  ingredient_img,
+		  list_img,
+		  brand_id,
+		  description,
+		  price
+		FROM
+		  products 
+		WHERE id IN 
+		  (SELECT DISTINCT 
+		    product_id 
+		  FROM
+		    sales 
+		  WHERE node_id = #{nodeId})
+    </select>
+	
+	 <!-- 获取商品数量 -->
+	<select id="getProductNum" resultType="int">
+       SELECT
+		  IFNULL(SUM(existing_num),0) AS num
+		FROM
+		  sales
+		WHERE node_id = #{nodeId}
+		  AND product_id = #{id}
+    </select>
+   
+   	<!-- 获取banner -->
+   	<select id="queryBannerList" resultType="String">
+   		SELECT 
+		  url 
+		FROM
+		  banner
+   	</select>
+   	
+   	<!-- 获取折扣比例 -->
+   	<select id="getDiscountCount" parameterType="int" resultType="int">
+   		SELECT 
+		      COUNT(percentage)
+		    FROM
+		      discount 
+		    WHERE node_id = #{nodeId}
+   	</select>
+   	
+   	<!-- 获取折扣比例 -->
+   	<select id="getDiscount" parameterType="int" resultType="int">
+   		SELECT 
+		  IFNULL(percentage,100)
+		FROM
+		  discount 
+		WHERE node_id =  #{nodeId}
+   	</select>
+</mapper>

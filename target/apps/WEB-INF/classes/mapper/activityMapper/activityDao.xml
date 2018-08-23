@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ugo.dao.activityDao.ActivityDao">
+    <select id="getActivityProducts" resultType="com.ugo.entity.activity.ActivityProduct">
+          select id,name,price
+          FROM products
+    </select>
+
+    <select id="getActivityPTs" resultType="com.ugo.entity.activity.ActivityPT">
+          select id,name,type
+          FROM nodes
+    </select>
+
+</mapper>

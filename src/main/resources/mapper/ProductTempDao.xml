@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.ugo.dao.ProductTempDao">
+    <!-- 目的：为dao接口方法提供sql语句配置 -->
+    <!-- 获取商品模版列表 -->
+    <select id="getList" resultType="ProductTemplate">
+            SELECT 
+			  * 
+			FROM
+			  product_template 
+			ORDER BY id DESC 
+    </select>
+    
+    <!-- 根据货道类型获取模板列表 -->
+    <select id="queryChannelsTypeList" parameterType="int" resultType="ProductTemplate">
+    	SELECT 
+			  * 
+			FROM
+			  product_template 
+			WHERE channels_type = #{channelsType}
+    </select>
+	
+	<!-- 获取模板 -->
+    <select id="getProductTemplate" resultType="ProductTemplate">
+            SELECT 
+			  * 
+			FROM
+			  product_template 
+			WHERE id = #{id} 
+    </select>
+    
+    <!--  -->
+    <select id="getQuantity" resultType="int" parameterType="int">
+            SELECT 
+			  COUNT(DISTINCT products_id) 
+			FROM
+			  product_temp_details 
+			WHERE template_id = #{templateId} 
+    </select>
+    
+    <!--  -->
+    <select id="getNum" resultType="int" parameterType="int">
+            SELECT 
+			  SUM(num) 
+			FROM
+			  product_temp_details 
+			WHERE template_id = #{tempId} 
+    </select>
+	
+	<!-- 新增模板 -->	
+    <insert id="addProductTemplate" parameterType="ProductTemplate" useGeneratedKeys="true" keyProperty="id"> 
+    	INSERT INTO product_template (NAME, channels_type,created_at) 
+		VALUES
+		  (#{name},#{channelsType},NOW()) 
+    </insert>
+    
+    <!-- 获取模板详情 -->
+    <select id="getTetailsList" parameterType="int" resultType="ProductTemplateTetails">
+            SELECT 
+			  * 
+			FROM
+			  product_temp_details 
+			WHERE template_id = #{templateId} 
+    </select>
+    
+    <!-- 获取模板详情生成库存 -->
+    <select id="getProductTempTetailsList" parameterType="int" resultType="ProductTemplateTetails">
+            SELECT 
+			  ptd.channels_id,
+			  pt.channels_type,
+			  ptd.products_id,
+			  ptd.products_name,
+			  ptd.brand_price,
+			  ptd.num,
+			  ptd.heat_up_time 
+			FROM
+			  product_temp_details ptd,
+			  product_template pt 
+			WHERE template_id = #{templateId} 
+			  AND ptd.template_id = pt.id  
+    </select>
+    
+    <!-- 新增模板详情 -->
+    <insert id="addProductTemplateTetails" parameterType="ProductTemplateTetails" >
+    	INSERT INTO product_temp_details (
+		  template_id,
+		  channels_type,
+		  channels_id,
+		  products_id,
+		  products_name,
+		  brand_id,
+		  brand_price,
+		  num,
+		  heat_up_time,
+		  created_at
+		) 
+		VALUES
+		  (
+		    #{templateId},#{channelsType},#{channelsId},#{productsId},
+		    #{productsName},#{brandId},#{brandPrice},#{num},#{heatUpTime},NOW()
+		  )
+    </insert>
+    
+    <!-- 获取模板内所有商品ID,不重复 -->
+    <select id="getTetailsIdList" parameterType="int" resultType="ProductTemplateTetails">
+            SELECT  
+			  DISTINCT(products_id),
+			  products_name,
+			  template_id
+			FROM
+			  product_temp_details 
+			WHERE template_id = #{tempId}
+    </select>
+    
+    <!-- 根据模版编号和商品Id查询其需求总数 -->
+    <select id="demandsAmount" parameterType="ProductTemplateTetails" resultType="int">
+		SELECT 
+		  SUM(num)
+		FROM
+		  product_temp_details 
+		WHERE products_id = #{productsId} AND template_id =  #{templateId} 
+    </select>
+    
+    <!-- 修改模板列表 -->
+    <update id="updateProductTemplate" parameterType="ProductTemplate">
+    	UPDATE 
+		  product_template 
+		SET
+		  NAME = #{name},
+		  updated_at = NOW()
+		WHERE id = #{id}
+    </update>
+    
+    <!-- 修改模板详情 -->
+    <update id="updateProductTemplateTetails" parameterType="ProductTemplateTetails">
+    	UPDATE 
+		  product_temp_details 
+		SET
+		  products_id = #{productsId},
+		  products_name =#{productsName},
+		  brand_price =#{brandPrice},
+		  num =#{num},
+		  heat_up_time =#{heatUpTime},
+		  updated_at = NOW() 
+		WHERE template_id = #{templateId}
+		  AND channels_id =#{channelsId}
+    </update>
+    
+</mapper>

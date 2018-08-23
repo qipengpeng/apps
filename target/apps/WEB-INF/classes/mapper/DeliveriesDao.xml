@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+	<mapper namespace="com.ugo.dao.DeliveriesDao">
+	
+    <!-- 目的：为dao接口方法提供sql语句配置 -->
+    <!-- 获取交割列表 -->
+    <select id="getDeliveriesList" resultType="Deliveries">
+        SELECT del.id,del.demand_id,dem.demand_date,del.created_at,del.operator FROM deliveries del,demands dem where del.demand_id = dem.id
+        order by del.created_at desc
+    </select>
+    <!-- 获取需求模版商品信息 -->
+    <select id="getDemandTemp" parameterType="int" resultType="DeliveryDetails">
+        SELECT 
+		  product_id,
+		  product_name,
+		  num AS demand_num
+		FROM
+		  demand_template_details 
+		WHERE demand_id = #{demandId}
+    </select>
+    <!-- 获取需求信息 -->
+    <select id="getDemands" parameterType="int" resultType="Demands">
+        SELECT * FROM demands where id = #{demandId}
+    </select>
+    
+    <!-- 获取交割详细信息 -->
+    <select id="getNodeDeliversList" parameterType="int" resultType="DeliveryDetails">
+        SELECT 
+		  * 
+		FROM
+		  delivery_details 
+		WHERE delivery_id = #{deliveryId} 
+    </select>
+    <!-- 获取交割详情商品信息 -->
+    <select id="QueryDeliveryDetailsList" parameterType="int" resultType="DeliveryDetails">
+       SELECT DISTINCT 
+		  product_id,
+		  delivery_id,
+		  product_id,
+		  product_name,
+		  unit_price,
+		  produce_date 
+		FROM
+		  delivery_details 
+		WHERE delivery_id = #{deliveryId}
+    </select>
+    <!-- 获取商品总数 -->
+    <select id="getDeliveryNum" parameterType="DeliveryDetails" resultType="int">
+       SELECT DISTINCT 
+		   SUM(delivery_num)
+		FROM
+		  delivery_details 
+		WHERE product_id = #{productId} and delivery_id = #{deliveryId}
+    </select>
+    <!-- 获取商品总价 -->
+    <select id="getDeliveryTotal" parameterType="int" resultType="int">
+       SELECT 
+		  SUM(s.num) 
+		FROM
+		  (SELECT 
+		    (unit_price * delivery_num) AS num 
+		  FROM
+		    delivery_details 
+		  WHERE delivery_id = #{deliveryId}
+		  GROUP BY product_id) s
+    </select>
+    
+    <!-- 获取交割信息 -->
+    <select id="getDeliveries" parameterType="int" resultType="Deliveries">
+        SELECT 
+          del.id,
+		  del.demand_id,
+		  dem.`demand_date`,
+		  del.`created_at`,
+		  del.operator 
+		FROM
+		  deliveries del,
+		  demands dem 
+		WHERE del.id = #{id} 
+		  AND del.`demand_id` = dem.`id`  
+    </select>
+    
+    <!-- 获取指定商品的采购价 -->
+	<select id="getUnitPrice" parameterType="int" resultType="int">
+        SELECT 
+		  * 
+		FROM
+		  delivery_details 
+		WHERE delivery_id = #{deliveryId} 
+    </select>
+    
+    <!-- 添加交割信息 -->
+	<insert id="addDeliveries" parameterType="Deliveries" useGeneratedKeys="true" keyProperty="id">
+			INSERT INTO deliveries (demand_id, operator,created_at) 
+				VALUES
+		    (#{demandId},#{operator},NOW()) 
+	</insert>
+   <!-- 添加交割详情 -->
+	<insert id="addDeliveryDetails" parameterType="DeliveryDetails">
+		INSERT INTO delivery_details 
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+	      <if test="deliveryId != null">
+	        delivery_id,
+	      </if>
+	      <if test="nodeId != 0">
+	        node_id,
+	      </if>
+	      <if test="nodeVmSeqName != null">
+	        node_vm_seq_name,
+	      </if>
+	      <if test="vendorId != 0">
+	        vendor_id,
+	      </if>
+	      <if test="productId != 0">
+	        product_id,
+	      </if>
+	      <if test="productName != null">
+	        product_name,
+	      </if>
+	      <if test="unitPrice != 0">
+	        unit_price,
+	      </if>
+	      <if test="deliveryNum != null">
+	        delivery_num,
+	      </if>
+	      	created_at
+	    </trim>
+	    <trim prefix="values (" suffix=")" suffixOverrides=",">
+	      <if test="deliveryId != null">
+	       #{deliveryId},
+	      </if>
+	      <if test="nodeId != 0">
+	        #{nodeId},
+	      </if>
+	      <if test="nodeVmSeqName != null">
+	       #{nodeVmSeqName},
+	      </if>
+	      <if test="vendorId != 0">
+	        #{vendorId},
+	      </if>
+	      <if test="productId != 0">
+	        #{productId},
+	      </if>
+	      <if test="productName != null">
+	        #{productName},
+	      </if>
+	      <if test="unitPrice != 0">
+	        #{unitPrice},
+	      </if>
+	      <if test="deliveryNum != null">
+	        #{deliveryNum},
+	      </if>
+			NOW()
+	    </trim> 
+	</insert>
+		<!-- (
+				  delivery_id,
+				  node_id,
+				  node_vm_seq_name,
+				  vendor_id,
+				  product_id,
+				  product_name,
+				  unit_price,
+				  delivery_num,
+				  created_at
+				) 
+				VALUES
+  (#{deliveryId},#{nodeId},#{nodeVmSeqName},#{vendorId},#{productId},#{productName},#{unitPrice},#{deliveryNum},NOW())  -->
+	
+</mapper>
