@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="4c7150f8-5c0c-49a7-8091-3aea16d8da55" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/ugo/dto/VmHttpRequest.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ugo/dto/VmHttpRequest.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/ugo/web/TimedTaskController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/ugo/web/TimedTaskController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/jdbc.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/jdbc.properties" afterDir="false" />
-    </list>
+    <list default="true" id="4c7150f8-5c0c-49a7-8091-3aea16d8da55" name="Default Changelist" comment="" />
     <ignored path="$PROJECT_DIR$/target/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -36,8 +31,8 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="2551" />
-    <option name="y" value="500" />
+    <option name="x" value="2181" />
+    <option name="y" value="208" />
     <option name="width" value="1282" />
     <option name="height" value="735" />
   </component>
@@ -119,8 +114,7 @@
     <option name="totallyTimeSpent" value="5455000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="2551" y="500" width="1282" height="735" extended-state="0" />
-    <editor active="true" />
+    <frame x="2181" y="208" width="1282" height="735" extended-state="0" />
     <layout>
       <window_info id="Designer" />
       <window_info id="Image Layers" />
